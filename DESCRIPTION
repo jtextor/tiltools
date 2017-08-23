@@ -1,0 +1,10 @@
+Package: tiltools
+Title: Miscellaneous Tools Used at the Tumour Immunology Lab
+Version: 0.0.0.9000
+Authors@R: person("Johannes", "Textor", email = "johannes.textor@radboudumc.nl", role = c("aut", "cre"))
+Description: Contains miscellaneous utility function that we use often enough to provide them in a separate package.
+Depends: R (>= 3.3.2)
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
