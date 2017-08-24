@@ -5,7 +5,9 @@
 \title{Plots a 2D Density}
 \usage{
 densityplot2d(x, y, nbins = 50, max.points = 5,
-  colfunc = colorRampPalette(c("lightblue", "green", "yellow", "red")), ...)
+  colfunc = colorRampPalette(c("gray", "darkblue", "lightblue", "green",
+  "yellow", "orange", "red")), tf.fun = identity, pch = 19, cex = 0.3,
+  color.levels = 20, ...)
 }
 \arguments{
 \item{x}{vector containing the X coordinates of the points.}
@@ -13,6 +15,25 @@ densityplot2d(x, y, nbins = 50, max.points = 5,
 \item{y}{vector containing the Y coordinates of the points.
 which are passed on to the plotting function so the plot can be
 customized.}
+
+\item{nbins}{how many bins to use for histogram.}
+
+\item{max.points}{when to start plotting heatmap instead of 
+individual points.}
+
+\item{colfunc}{color mapping for heatmap.}
+
+\item{tf.fun}{function to apply to histogram values before 
+plotting them, \code{log} can be useful.}
+
+\item{pch}{point character to use for individual points.}
+
+\item{cex}{point character expansion to use for individual points.}
+
+\item{color.levels}{how many different colors to use for heatmap.}
+
+\item{...}{further arguments to be passed to the plotting function,
+such as \code{xlim} or \code{xlab}.}
 }
 \description{
 This function tries to replicate 'smart' 2D density plots 

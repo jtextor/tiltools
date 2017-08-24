@@ -15,9 +15,20 @@ NULL
 #' @param y vector containing the Y coordinates of the points.
 #'  which are passed on to the plotting function so the plot can be
 #'  customized.
+#' @param nbins how many bins to use for histogram.
+#' @param max.points when to start plotting heatmap instead of 
+#'  individual points.
+#' @param colfunc color mapping for heatmap.
+#' @param tf.fun function to apply to histogram values before 
+#'  plotting them, \code{log} can be useful.
+#' @param pch point character to use for individual points.
+#' @param cex point character expansion to use for individual points.
+#' @param color.levels how many different colors to use for heatmap.
+#' @param ... further arguments to be passed to the plotting function,
+#'  such as \code{xlim} or \code{xlab}. 
 #' @export
 densityplot2d <- function( x, y, nbins=50, max.points=5, 
-	colfunc=colorRampPalette(c("lightblue", "green", "yellow", "red")),
+	colfunc=colorRampPalette(c("gray","darkblue","lightblue", "green", "yellow","orange", "red")), tf.fun=identity, pch=19, cex=0.3, color.levels=20,
 	... ){
 	x <- as.numeric(x)
 	y <- as.numeric(y)
@@ -49,12 +60,14 @@ densityplot2d <- function( x, y, nbins=50, max.points=5,
         f.int <- freq2D[cbind(x.int,y.int)]	
 	freq2D[freq2D <= max.points] <- NA
 
+	freq2D <- tf.fun(freq2D)
+
         image( head(x.bin,-1)+diff(x.bin)/2, head(y.bin,-1)+diff(y.bin)/2, freq2D,
 		useRaster=FALSE,
-		col=colfunc(12), ... )
+		col=colfunc(color.levels), ... )
 
         points( x[f.int<=max.points], y[f.int<=max.points],
-		pch=19, cex=.3, col=colfunc(12)[1] )
+		pch=pch, cex=cex, col=colfunc(color.levels)[1] )
 
         #x.points <- c(0,1,2,5,10,20,50,100,200,500,1000)
         #axis( 1, log( 1+x.points, base=2 ), as.character(x.points) )
