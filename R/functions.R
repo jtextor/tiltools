@@ -74,3 +74,17 @@ densityplot2d <- function( x, y, nbins=50, max.points=5,
         #axis( 2, log( 1+x.points, base=2 ), as.character(x.points) )
 
 }
+
+#' @export
+confregion2d <- function(M, max.points=1000, alpha=0.05){
+	requireNamespace("depth",quietly=TRUE)
+	if( nrow(M) > max.points ){
+		M <- M[sample(1:nrow(M),max.points,replace=TRUE),]
+	}
+	d <- apply( M, 1, function(x) depth::depth(x,M) )
+	dt <- quantile( d, alpha )
+	M <- M[d>dt,]
+	h <- chull( M )
+	M[c(h,h[1]),]
+}
+
