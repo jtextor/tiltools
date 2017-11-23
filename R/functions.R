@@ -27,7 +27,66 @@ NULL
 #' @param ... further arguments to be passed to the plotting function,
 #'  such as \code{xlim} or \code{xlab}. 
 #' @export
-densityplot2d <- function( x, y, nbins=50, max.points=5, 
+densityplot2d <- function( x, y, z=NULL, nbins=50, max.points=5, 
+	colfunc=colorRampPalette(c("gray","darkblue","lightblue", "green", "yellow","orange", "red")), tf.fun=identity, pch=19, cex=0.3, color.levels=20,
+	... ){
+	x <- as.numeric(x)
+	y <- as.numeric(y)
+	if( any( is.na(x) ) ){
+                stop("NA values in X!")
+        }
+        if( any( is.na(y) ) ){
+		stop("NA values in Y!")
+	}
+        x.bin <- seq(floor(min(x)-.001), ceiling(max(x)+.001), length=(nbins+1))
+	y.bin <- seq(floor(min(y)-.001), ceiling(max(y)+.001), length=(nbins+1))
+
+
+	x.int <- as.integer(findInterval( x, x.bin ))
+        y.int <- as.integer(findInterval( y, y.bin ))
+
+
+        pix <- (x.int-1)*(nbins) + (y.int)
+
+
+	density.matrix <- tabulate(pix)
+
+
+	density.matrix <- c(density.matrix,rep(0,nbins^2-length(density.matrix)))
+	density.matrix <- matrix( density.matrix, nrow=nbins, byrow=TRUE )
+       	points.not.in.image <- density.matrix[cbind(x.int,y.int)] <= max.points
+
+	#stopifnot( all( density.matrix[cbind(x.int,y.int)] > 0 ) )
+
+	density.matrix[density.matrix <= max.points] <- NA
+
+	if( !is.null( z ) ){
+		z.matrix <- tapply( z, pix, mean )[as.character(1:(nbins^2))]
+		z.matrix <- matrix( z.matrix, nrow=nbins, byrow=TRUE )
+	}
+
+	if( is.null( z ) ){
+        	plot( x[points.not.in.image], y[points.not.in.image],
+			pch=pch, cex=cex, col=colfunc(color.levels)[1],
+			xlim=range(x.bin), 
+			ylim=range(y.bin), type='p' )
+
+	        image( head(x.bin,-1)+diff(x.bin)/2, head(y.bin,-1)+diff(y.bin)/2, 
+			tf.fun(density.matrix),
+			useRaster=FALSE, add=TRUE,
+			col=colfunc(color.levels), ... )
+	} else {
+	}
+
+
+        #x.points <- c(0,1,2,5,10,20,50,100,200,500,1000)
+        #axis( 1, log( 1+x.points, base=2 ), as.character(x.points) )
+        #axis( 2, log( 1+x.points, base=2 ), as.character(x.points) )
+
+}
+
+
+newplot2d <- function( x, y, nbins=50, max.points=5, 
 	colfunc=colorRampPalette(c("gray","darkblue","lightblue", "green", "yellow","orange", "red")), tf.fun=identity, pch=19, cex=0.3, color.levels=20,
 	... ){
 	x <- as.numeric(x)
@@ -74,6 +133,7 @@ densityplot2d <- function( x, y, nbins=50, max.points=5,
         #axis( 2, log( 1+x.points, base=2 ), as.character(x.points) )
 
 }
+
 
 #' @export
 confregion2d <- function(M, max.points=1000, alpha=0.05){
