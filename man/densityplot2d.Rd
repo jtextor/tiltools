@@ -4,7 +4,7 @@
 \alias{densityplot2d}
 \title{Plots a 2D Density}
 \usage{
-densityplot2d(x, y, nbins = 50, max.points = 5,
+densityplot2d(x, y, z = NULL, nbins = 50, max.points = 5,
   colfunc = colorRampPalette(c("gray", "darkblue", "lightblue", "green",
   "yellow", "orange", "red")), tf.fun = identity, pch = 19, cex = 0.3,
   color.levels = 20, ...)
@@ -41,4 +41,7 @@ as they are found in flow cytometry data analysis software.
 These plots commonly work with millions of points. In dense
 regions, they will plot these as a heatmap; in sparse regions,
 they will show the actual points.
+}
+\examples{
+densityplot2d( facsdata[,1], facsdata[,2] )
 }
