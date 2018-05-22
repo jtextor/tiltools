@@ -43,13 +43,26 @@ densityplot2d <- function( x, y, z=NULL, nbins=50, max.points=5,
         if( any( is.na(y) ) ){
 		stop("NA values in Y!")
 	}
-        x.bin <- seq(floor(min(x)-.001), ceiling(max(x)+.001), length=(nbins+1))
-	y.bin <- seq(floor(min(y)-.001), ceiling(max(y)+.001), length=(nbins+1))
+
+	x.args <- list(...)
+
+	if( "xlim" %in% names(x.args) ){
+		x.bin <- seq(x.args$xlim[1],x.args$xlim[2],length=nbins+1)
+		x.args[["xlim"]] <- NULL
+	} else {
+	        x.bin <- seq(floor(min(x)-.001), ceiling(max(x)+.001), length=(nbins+1))
+	}
+
+	if( "ylim" %in% names(x.args) ){
+		y.bin <- seq(x.args$ylim[1],x.args$ylim[2],length=nbins+1)
+		x.args[["ylim"]] <- NULL
+	} else {
+		y.bin <- seq(floor(min(y)-.001), ceiling(max(y)+.001), length=(nbins+1))
+	}
 
 
 	x.int <- as.integer(findInterval( x, x.bin ))
         y.int <- as.integer(findInterval( y, y.bin ))
-
 
         pix <- (x.int-1)*(nbins) + (y.int)
 
@@ -70,52 +83,52 @@ densityplot2d <- function( x, y, z=NULL, nbins=50, max.points=5,
 		z.matrix <- matrix( z.matrix, nrow=nbins, byrow=TRUE )
 	}
 
-        plot( NA,
+	do.call(plot,c(list(NA,
 		xlim=range(x.bin), 
-		ylim=range(y.bin), ... )
+		ylim=range(y.bin)),x.args))
 
-		M <- tf.fun( density.matrix )
-		zlim <- range(M[is.finite(M)])
+	M <- tf.fun( density.matrix )
+	zlim <- range(M[is.finite(M)])
 
- 		M <- (M - zlim[1L])/diff(zlim)
-		col <- colfunc( color.levels )
+ 	M <- (M - zlim[1L])/diff(zlim)
+	col <- colfunc( color.levels )
 
-		if( !is.null(z) ){
-			zp <- z[points.not.in.image]
-			zlim <- range( z.matrix[is.finite(z.matrix)] )
-			z.matrix <- 1-(z.matrix-zlim[1L])/diff(zlim)
-        		zi <- floor((color.levels - 1e-05) * z.matrix + 1e-07)
-			zi[zi < 0 | zi >= color.levels] <- NA
-			zp <- 1-(zp-zlim[1L])/diff(zlim)
-			zp <- floor((color.levels - 1e-05) * zp + 1e-07)
-			zp[zp < 0 | zp >= color.levels] <- NA
-		}
+	if( !is.null(z) ){
+		zp <- z[points.not.in.image]
+		zlim <- range( z.matrix[is.finite(z.matrix)] )
+		z.matrix <- 1-(z.matrix-zlim[1L])/diff(zlim)
+       		zi <- floor((color.levels - 1e-05) * z.matrix + 1e-07)
+		zi[zi < 0 | zi >= color.levels] <- NA
+		zp <- 1-(zp-zlim[1L])/diff(zlim)
+		zp <- floor((color.levels - 1e-05) * zp + 1e-07)
+		zp[zp < 0 | zp >= color.levels] <- NA
+	}
 
-        	Mi <- floor((color.levels - 1e-05) * M + 1e-07)
-		Mi[Mi < 0 | Mi >= color.levels] <- NA
+       	Mi <- floor((color.levels - 1e-05) * M + 1e-07)
+	Mi[Mi < 0 | Mi >= color.levels] <- NA
 
-		if( is.null(z) ){
-			#1D lookup
-			Mc <- col[Mi+1L]
-		} else {
-			#2D lookup
-			col <- sapply(rev(col),function(x)
-				colorRampPalette(c("white",x))(color.levels+1) )
-			col <- col[2:(color.levels+1),,drop=FALSE]
-			Mc <- col[cbind(c(Mi+1L),c(zi+1L))]
-		}
+	if( is.null(z) ){
+		#1D lookup
+		Mc <- col[Mi+1L]
+	} else {
+		#2D lookup
+		col <- sapply(rev(col),function(x)
+			colorRampPalette(c("white",x))(color.levels+1) )
+		col <- col[2:(color.levels+1),,drop=FALSE]
+		Mc <- col[cbind(c(Mi+1L),c(zi+1L))]
+	}
 
-		dim(Mc) <- dim(M)
+	dim(Mc) <- dim(M)
 
-		rasterImage( t(Mc)[nrow(Mc):1, ,drop=FALSE],
-			min(x.bin), min(y.bin), max(x.bin), max(y.bin), interpolate=FALSE )
-		if( is.null( z ) ){
-	        	points( x[points.not.in.image], y[points.not.in.image],
-				pch=pch, cex=cex, col=colfunc(color.levels)[1] )
-		} else {
-	        	points( x[points.not.in.image], y[points.not.in.image],
-				pch=pch, cex=cex, col=col[1,zp+1] )
-		}
+	rasterImage( t(Mc)[nrow(Mc):1, ,drop=FALSE],
+		min(x.bin), min(y.bin), max(x.bin), max(y.bin), interpolate=FALSE )
+	if( is.null( z ) ){
+        	points( x[points.not.in.image], y[points.not.in.image],
+			pch=pch, cex=cex, col=colfunc(color.levels)[1] )
+	} else {
+        	points( x[points.not.in.image], y[points.not.in.image],
+			pch=pch, cex=cex, col=col[1,zp+1] )
+	}
 
 
         #x.points <- c(0,1,2,5,10,20,50,100,200,500,1000)
